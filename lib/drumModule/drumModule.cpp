@@ -10,8 +10,8 @@ static const uint16_t CHECK_DELAY = 200; // Micro-seconds, 1640 Hz
 
 drumModule::drumModule()
 { 
-    threshold = 10;
-    maxRaw = 300;
+    minThreshold = 10;
+    maxThreshold = 300;
     decay = 20;
 }
 
@@ -21,9 +21,14 @@ void drumModule::init(uint8_t _pin)
     currentDrumState = drumIdle;
 }
 
-void drumModule::setThreshold(uint8_t _threshold)
+void drumModule::setMinThreshold(uint8_t _minThreshold)
 {
-    threshold = _threshold;
+    minThreshold = _minThreshold;
+}
+
+void drumModule::setMaxThreshold(uint8_t _maxThreshold)
+{
+    maxThreshold = _maxThreshold;
 }
 
 void drumModule::setDecay(uint8_t _decay)
@@ -47,7 +52,7 @@ void drumModule::manage()
         {
         case drumIdle:
 
-            if (currentRaw > threshold)
+            if (currentRaw > minThreshold)
             {
                 maxCurrentRaw = currentRaw;
                 currentDrumState = drumStroke;
@@ -71,7 +76,7 @@ void drumModule::manage()
                 {
 
                     currentDrumState = drumDecay;
-                    stroke = ((float)maxCurrentRaw - threshold) / (maxRaw - threshold);
+                    stroke = ((float)maxCurrentRaw - minThreshold) / (maxThreshold - minThreshold);
                     if (stroke > 1.0f)
                         stroke = 1.0f;
                     
@@ -126,4 +131,14 @@ float drumModule::getHit()
     maxCurrentRaw = 0;
 
     return stroke;
+}
+
+void drumModule::setPadSound(const unsigned int *_padSound)
+{
+    padSound = _padSound;
+}
+
+const unsigned int *drumModule::getPadSound()
+{
+    return padSound;
 }
